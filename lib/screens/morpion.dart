@@ -126,7 +126,10 @@ class _MorpionPageState extends State<MorpionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Morpion"),
+        title: Text("Morpion",style: TextStyle(color: Colors.white),),
+        centerTitle: true, // Centrer le titre
+        backgroundColor: Colors.blueAccent, // Fond de la barre de navigation en bleu
+        elevation: 0, // Supprimer l'ombre sous la barre de navigation
       ),
       body: Center(
         child: SingleChildScrollView(

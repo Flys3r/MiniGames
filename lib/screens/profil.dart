@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
 import '../database/database.dart';
+import 'edit_profil.dart';
 
 class ProfilPage extends StatefulWidget {
   final String userEmail;
@@ -12,8 +12,10 @@ class ProfilPage extends StatefulWidget {
 }
 
 class _ProfilPageState extends State<ProfilPage> {
-  late String firstName;
-  late String lastName;
+  String? firstName;
+  String? lastName;
+  String? email;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -22,20 +24,34 @@ class _ProfilPageState extends State<ProfilPage> {
   }
 
   Future<void> _getUserDetails() async {
-    // Utilisez la méthode getUserDetails de la classe DatabaseHelper pour obtenir les détails de l'utilisateur
-    DatabaseHelper databaseHelper = DatabaseHelper.instance;
-    Database db = await databaseHelper.database;
-    List<Map<String, dynamic>> result = await db.query(
-      'users',
-      columns: ['first_name', 'last_name'],
-      where: 'email = ?',
-      whereArgs: [widget.userEmail],
-    );
-    if (result.isNotEmpty) {
+    try {
+      Map<String, dynamic>? user = await DatabaseHelper.instance.getUserByEmail(widget.userEmail);
+      if (user != null) {
+        setState(() {
+          firstName = user['first_name'];
+          lastName = user['last_name'];
+          email = user['email'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Utilisateur non trouvé'),
+          ),
+        );
+      }
+    } catch (e) {
       setState(() {
-        firstName = result[0]['first_name'];
-        lastName = result[0]['last_name'];
+        isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Une erreur s\'est produite lors de la récupération des détails de l\'utilisateur'),
+        ),
+      );
     }
   }
 
@@ -43,25 +59,73 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil'),
+        title: Text('Profil',style: TextStyle(color: Colors.white),),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
       ),
-      body: Center(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Nom: $firstName $lastName',
-              style: TextStyle(fontSize: 24),
+            Card(
+              elevation: 8.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.person, size: 50, color: Colors.blueAccent),
+                      title: Text(
+                        '${firstName ?? 'Inconnu'} ${lastName ?? 'Inconnu'}',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        'Email: ${email ?? 'Inconnu'}',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditProfilPage(
+                              userEmail: email!,
+                              firstName: firstName!,
+                              lastName: lastName!,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.edit, color: Colors.white),
+                      label: Text(
+                        'Modifier le profil',
+                        style: TextStyle(color: Colors.black), // Set text color to black
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                        textStyle: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            SizedBox(height: 10),
-            Text(
-              'Email: ${widget.userEmail}',
-              style: TextStyle(fontSize: 20),
-            ),
-
           ],
         ),
       ),
     );
   }
 }
+

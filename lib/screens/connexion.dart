@@ -3,6 +3,7 @@ import '../database/database.dart';
 import '../screens/home.dart';
 import '../screens/inscription.dart';
 
+
 class ConnexionScreen extends StatefulWidget {
   @override
   _ConnexionScreenState createState() => _ConnexionScreenState();
@@ -24,25 +25,33 @@ class _ConnexionScreenState extends State<ConnexionScreen> {
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              SizedBox(height: 20),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Adresse Email'),
+                decoration: InputDecoration(
+                  labelText: 'Adresse Email',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez saisir votre adresse email';
                   }
-                  // Validation d'email simple
                   if (!value.contains('@')) {
                     return 'Veuillez saisir une adresse email valide';
                   }
                   return null;
                 },
               ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Mot de passe'),
+                decoration: InputDecoration(
+                  labelText: 'Mot de passe',
+                  border: OutlineInputBorder(),
+                ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -51,17 +60,16 @@ class _ConnexionScreenState extends State<ConnexionScreen> {
                   return null;
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _login();
-                    }
-                  },
-                  child: Text('Se connecter'),
-                ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _login();
+                  }
+                },
+                child: Text('Se connecter'),
               ),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -82,17 +90,14 @@ class _ConnexionScreenState extends State<ConnexionScreen> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    // Vérifier les identifiants dans la base de données
     bool loggedIn = await DatabaseHelper.instance.loginUser(email, password);
 
     if (loggedIn) {
-      // Si la connexion réussit, naviguez vers la page HomeScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen(userEmail: email, firstName: '', lastName: '')),
       );
     } else {
-      // Sinon, affichez un message d'erreur
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Adresse email ou mot de passe incorrect'),

@@ -3,6 +3,10 @@ import '/screens/shifumi.dart';
 import '/screens/morpion.dart';
 import '/screens/profil.dart';
 import '/screens/connexion.dart';
+import '/screens/chess.dart';
+import '/screens/solitaire.dart';
+import '/screens/blackjack.dart';
+import '/screens/sudoku.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userEmail;
@@ -15,7 +19,13 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Jeux'),
+        title: Text(
+          'Jeux',
+          style: TextStyle(color: Colors.white), // Texte en blanc
+        ),
+        centerTitle: true, // Centrer le titre
+        backgroundColor: Colors.blueAccent, // Fond de la barre de navigation en bleu
+        elevation: 0, // Supprimer l'ombre sous la barre de navigation
         leading: IconButton(
           icon: Icon(Icons.person),
           onPressed: () {
@@ -31,63 +41,120 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ConnexionScreen()), // Redirigez vers la page de connexion
+                MaterialPageRoute(builder: (context) => ConnexionScreen()),
               );
             },
           ),
         ],
       ),
-      body: ListView(
-        children: <Widget>[
-          _buildCard(
-            context,
-            'Shifumi',
-            'assets/shifumi.jpg',
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ShifumiPage()),
-              );
-            },
-          ),
-          _buildCard(
-            context,
-            'Morpion',
-            'assets/morpion.jpg',
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MorpionPage()),
-              );
-            },
-          ),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.count(
+          padding: EdgeInsets.all(16.0),
+          crossAxisCount: 2,
+          mainAxisSpacing: 90.0,
+          crossAxisSpacing: 20.0,
+          children: [
+            _buildGameCard(
+              context,
+              'Shifumi',
+              'assets/shifumi.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ShifumiPage()),
+                );
+              },
+            ),
+            _buildGameCard(
+              context,
+              'Morpion',
+              'assets/morpion.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MorpionPage()),
+                );
+              },
+            ),
+            _buildGameCard(
+              context,
+              'Échecs',
+              'assets/chess.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChessPage()),
+                );
+              },
+            ),
+            _buildGameCard(
+              context,
+              'Solitaire',
+              'assets/solitaire.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SolitairePage()),
+                );
+              },
+            ),
+            _buildGameCard(
+              context,
+              'Blackjack',
+              'assets/blackjack.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BlackjackPage()),
+                );
+              },
+            ),
+            _buildGameCard(
+              context,
+              'Sudoku',
+              'assets/sudoku.jpg',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SudokuPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String imagePath, Function() onTap) {
+  Widget _buildGameCard(BuildContext context, String title, String imagePath, Function() onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
         elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Image.asset(
-              imagePath,
-              width: 150,
-              height: 150,
-              fit: BoxFit.cover,
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: onTap,
-              child: Text('Jouer'),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                title,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
@@ -95,9 +162,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
